@@ -28,22 +28,16 @@ class Player {
   }
 
   draw() {
-    // c.fillStyle = "red";
-    // c.fillRect(this.position.x, this.position.y, this.width, this.height);
-
     c.save();
     c.translate(
       player.position.x + player.width / 2,
       player.position.y + player.height / 2
     );
-
     c.rotate(this.rotation);
-
     c.translate(
       -player.position.x - player.width / 2,
       -player.position.y - player.height / 2
     );
-
     c.drawImage(
       this.image,
       this.position.x,
@@ -53,6 +47,7 @@ class Player {
     );
     c.restore();
   }
+
   update() {
     if (this.image) {
       this.draw();
@@ -61,7 +56,30 @@ class Player {
   }
 }
 
+class Projectile {
+  constructor({ position, velocity }) {
+    this.position = position;
+    this.velocity = velocity;
+    this.radius = 3;
+  }
+
+  draw() {
+    c.beginPath();
+    c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+    c.fillStyle = "red";
+    c.fill();
+    c.closePath();
+  }
+
+  update() {
+    this.draw();
+    this.position.x += this.velocity.x;
+    this.position.y += this.velocity.y;
+  }
+}
+
 const player = new Player();
+const projectiles = [];
 const keys = {
   q: {
     pressed: false,
@@ -88,6 +106,15 @@ function animate() {
   c.fillStyle = "black";
   c.fillRect(0, 0, canvas.width, canvas.height);
   player.update();
+  projectiles.forEach((projectile, index) => {
+    if (projectile.position.y + projectile.radius <= 0) {
+      setTimeout(() => {
+        projectiles.splice(index, 1);
+      }, 0);
+    } else {
+      projectile.update();
+    }
+  });
 
   if (
     (keys.q.pressed || keys.ArrowLeft.pressed || keys.a.pressed) &&
@@ -113,27 +140,40 @@ window.addEventListener("keydown", ({ key }) => {
   // console.log(key);
   switch (key) {
     case "ArrowLeft":
-      console.log("left");
+      // console.log("left");
       keys.ArrowLeft.pressed = true;
       break;
     case "q":
-      console.log("left");
+      // console.log("left");
       keys.q.pressed = true;
       break;
     case "a":
-      console.log("left");
+      // console.log("left");
       keys.a.pressed = true;
       break;
     case "ArrowRight":
-      console.log("right");
+      // console.log("right");
       keys.ArrowRight.pressed = true;
       break;
     case "d":
-      console.log("right");
+      // console.log("right");
       keys.d.pressed = true;
       break;
     case " ":
-      console.log("space");
+      // console.log("space");
+      projectiles.push(
+        new Projectile({
+          position: {
+            x: player.position.x + player.width / 2,
+            y: player.position.y,
+          },
+          velocity: {
+            x: 0,
+            y: -10,
+          },
+        })
+      );
+      // console.log(projectiles);
       break;
   }
 });
@@ -142,27 +182,27 @@ window.addEventListener("keyup", ({ key }) => {
   // console.log(key);
   switch (key) {
     case "ArrowLeft":
-      console.log("left");
+      // console.log("left");
       keys.ArrowLeft.pressed = false;
       break;
     case "q":
-      console.log("left");
+      // console.log("left");
       keys.q.pressed = false;
       break;
     case "a":
-      console.log("left");
+      // console.log("left");
       keys.a.pressed = false;
       break;
     case "ArrowRight":
-      console.log("right");
+      // console.log("right");
       keys.ArrowRight.pressed = false;
       break;
     case "d":
-      console.log("right");
+      // console.log("right");
       keys.d.pressed = false;
       break;
     case " ":
-      console.log("space");
+      // console.log("space");
       break;
   }
 });
