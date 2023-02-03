@@ -79,6 +79,36 @@ class Projectile {
   }
 }
 
+class Particule {
+  constructor({ position, velocity, radius, color }) {
+    this.position = position;
+    this.velocity = velocity;
+
+    this.radius = radius;
+    this.color = color;
+    this.opacity = 1;
+  }
+
+  draw() {
+    c.save();
+    c.globalAlpha = this.opacity;
+    c.beginPath();
+    c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+    c.fillStyle = this.color;
+    c.fill();
+    c.closePath();
+    c.restore();
+  }
+
+  update() {
+    this.draw();
+    this.position.x += this.velocity.x;
+    this.position.y += this.velocity.y;
+
+    this.opacity -= 0.01;
+  }
+}
+
 class InvaderProjectile {
   constructor({ position, velocity }) {
     this.position = position;
@@ -205,6 +235,7 @@ const player = new Player();
 const projectiles = [];
 const grids = [];
 const invaderProjectiles = [];
+const particules = [];
 
 const keys = {
   q: {
@@ -237,6 +268,17 @@ function animate() {
   c.fillRect(0, 0, canvas.width, canvas.height);
 
   player.update();
+
+  particules.forEach((particule, i) => {
+    if (particule.opacity <= 0) {
+      setTimeout(() => {
+        particules.splice(i, 1);
+      }, 0);
+    } else {
+      particule.update();
+    }
+  });
+  console.log(particules);
 
   invaderProjectiles.forEach((invaderProjectile, index) => {
     if (
@@ -284,6 +326,7 @@ function animate() {
     grid.invaders.forEach((invader, i) => {
       invader.update({ velocity: grid.velocity });
 
+      //projectile hit enemy
       projectiles.forEach((projectile, j) => {
         if (
           projectile.position.y - projectile.radius <=
@@ -303,6 +346,23 @@ function animate() {
 
             //remove invader and projectile
             if (invaderFound && projectileFound) {
+              for (let i = 0; i < 15; i++) {
+                particules.push(
+                  new Particule({
+                    position: {
+                      x: invader.position.x + invader.width / 2,
+                      y: invader.position.y + invader.height / 2,
+                    },
+                    velocity: {
+                      x: (Math.random() - 0.5) * 2,
+                      y: (Math.random() - 0.5) * 2,
+                    },
+                    radius: Math.random() * 3,
+                    color: "#BAA0DE",
+                  })
+                );
+              }
+
               grid.invaders.splice(i, 1);
               projectiles.splice(j, 1);
 
