@@ -80,13 +80,14 @@ class Projectile {
 }
 
 class Particule {
-  constructor({ position, velocity, radius, color }) {
+  constructor({ position, velocity, radius, color, fades }) {
     this.position = position;
     this.velocity = velocity;
 
     this.radius = radius;
     this.color = color;
     this.opacity = 1;
+    this.fades = fades;
   }
 
   draw() {
@@ -105,7 +106,9 @@ class Particule {
     this.position.x += this.velocity.x;
     this.position.y += this.velocity.y;
 
-    this.opacity -= 0.01;
+    if (this.fades) {
+      this.opacity -= 0.01;
+    }
   }
 }
 
@@ -261,7 +264,24 @@ const keys = {
 let frames = 0;
 let randomInterval = Math.floor(Math.random() * 500 + 500);
 
-function createParticules({ object, color }) {
+for (let i = 0; i < 100; i++) {
+  particules.push(
+    new Particule({
+      position: {
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+      },
+      velocity: {
+        x: 0,
+        y: 0.3,
+      },
+      radius: Math.random() * 2,
+      color: "white",
+    })
+  );
+}
+
+function createParticules({ object, color, fades }) {
   for (let i = 0; i < 15; i++) {
     particules.push(
       new Particule({
@@ -275,6 +295,7 @@ function createParticules({ object, color }) {
         },
         radius: Math.random() * 3,
         color: color || "#BAA0DE",
+        fades,
       })
     );
   }
@@ -288,6 +309,11 @@ function animate() {
   player.update();
 
   particules.forEach((particule, i) => {
+    if (particule.position.y - particule.radius >= canvas.height) {
+      particule.position.x = Math.random() * canvas.width;
+      particule.position.y = -particule.radius;
+    }
+
     if (particule.opacity <= 0) {
       setTimeout(() => {
         particules.splice(i, 1);
@@ -327,6 +353,7 @@ function animate() {
         createParticules({
           object: player,
           color: "white",
+          fades: true,
         });
       }
     }
@@ -377,6 +404,7 @@ function animate() {
             if (invaderFound && projectileFound) {
               createParticules({
                 object: invader,
+                fades: true,
               });
 
               grid.invaders.splice(i, 1);
