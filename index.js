@@ -1,4 +1,5 @@
 const canvas = document.querySelector("canvas");
+const scoreEl = document.querySelector("#scoreEl");
 const c = canvas.getContext("2d");
 
 canvas.width = innerWidth;
@@ -220,7 +221,7 @@ class Grid {
         );
       }
     }
-    console.log(this.invaders);
+    // console.log(this.invaders);
   }
 
   update() {
@@ -269,6 +270,8 @@ let game = {
   over: false,
   active: true,
 };
+
+let score = 0;
 
 for (let i = 0; i < 100; i++) {
   particules.push(
@@ -329,7 +332,7 @@ function animate() {
       particule.update();
     }
   });
-  console.log(particules);
+  // console.log(particules);
 
   invaderProjectiles.forEach((invaderProjectile, index) => {
     if (
@@ -415,6 +418,10 @@ function animate() {
 
             //remove invader and projectile
             if (invaderFound && projectileFound) {
+              score += 100;
+              scoreEl.innerHTML = score;
+              // console.log(score);
+
               createParticules({
                 object: invader,
                 fades: true,
@@ -464,7 +471,7 @@ function animate() {
     grids.push(new Grid());
     randomInterval = Math.floor(Math.random() * 500 + 500);
     frames = 0;
-    console.log(randomInterval);
+    // console.log(randomInterval);
   }
 
   frames++;
